@@ -1,4 +1,7 @@
 # Modeling with code
+환경 : Google Colab
+
+<br>
 
 ## Part1
 - 이거 왜 안되지?
