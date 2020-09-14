@@ -58,8 +58,9 @@ file_list = os.listdir(os.getcwd())
 print(file_list)
 
 # 내부에 MACOS 용 파일과 자잘한 더미 파일이 존재하니 이를 제거해 줍니다.
+# 또한, pedestrian dataset 은 noise 가 있을 수 있기 때문에, 이를 모두 제거해야 합니다.
 !rm -r __MACOSX
-!rm ./pedestrian/.DS_Store
+!rm -r pedestrian
 !ls
 
 %cd /content/gdrive/"My Drive"/data/helmetclassification/non_helmet
@@ -103,8 +104,10 @@ for f in file_list:
 !rm -r non_helmet
 !ls
 
+
 # 이미지의 size 를 재기 위해, PIL 을 import 합니다
 from PIL import Image
+
 
 %cd /content/gdrive/"My Drive"/data/helmetclassification/train/helmet/
 file_list = os.listdir(os.getcwd())
@@ -113,8 +116,8 @@ cnt = 0
 for i, img_name in enumerate(file_list):
   print(i, '/', len(file_list))
   img = Image.open(img_name)
-  if img.size[0] * img.size[1] < IMG_WIDTH * 0.3  * IMG_WIDTH * 0.3 : # 이미지의 해상도가 input 해상도의 1/9 수준이라면. 
-                                                                      # 1/9 로 잡은 이유는, nonhelmet data 의 개수와 비슷하게 맞추기 위함입니다.
+  if img.size[0] * img.size[1] < IMG_WIDTH * 0.4  * IMG_WIDTH * 0.4 : # 이미지의 해상도가 input 해상도의 일정 수준이라면. 
+                                                                      # 0.4 로 잡은 이유는, nonhelmet data 의 개수와 비슷하게 맞추기 위함입니다.
     cnt+=1
     remove_candidate_helmet_training_file_list.append(img_name)
 print("low resolution ratio : ", cnt, '/', len(file_list))
@@ -126,10 +129,37 @@ cnt = 0
 for i, img_name in enumerate(file_list):
   print(i, '/', len(file_list))
   img = Image.open(img_name)
-  if img.size[0] * img.size[1] < IMG_WIDTH * 0.3  * IMG_WIDTH * 0.3 :
+  if img.size[0] * img.size[1] < IMG_WIDTH * 0.4  * IMG_WIDTH * 0.4 :
     cnt+=1
     remove_candidate_helmet_testing_file_list.append(img_name)    
 print("low resolution ratio : ", cnt, '/', len(file_list))
+
+
+%cd /content/gdrive/"My Drive"/data/helmetclassification/train/non_helmet/
+file_list = os.listdir(os.getcwd())
+remove_candidate_nonhelmet_training_file_list = []
+cnt = 0
+for i, img_name in enumerate(file_list):
+  print(i, '/', len(file_list))
+  img = Image.open(img_name)
+  if img.size[0] * img.size[1] < IMG_WIDTH * 0.4  * IMG_WIDTH * 0.4 : # 이미지의 해상도가 input 해상도의 일정 수준이라면. 
+                                                                      # 0.4 로 잡은 이유는, nonhelmet data 의 개수와 비슷하게 맞추기 위함입니다.
+    cnt+=1
+    remove_candidate_nonhelmet_training_file_list.append(img_name)
+print("low resolution ratio : ", cnt, '/', len(file_list))
+
+%cd /content/gdrive/"My Drive"/data/helmetclassification/test/non_helmet/
+file_list = os.listdir(os.getcwd())
+remove_candidate_nonhelmet_testing_file_list = []
+cnt = 0
+for i, img_name in enumerate(file_list):
+  print(i, '/', len(file_list))
+  img = Image.open(img_name)
+  if img.size[0] * img.size[1] < IMG_WIDTH * 0.4  * IMG_WIDTH * 0.4 :
+    cnt+=1
+    remove_candidate_nonhelmet_testing_file_list.append(img_name)    
+print("low resolution ratio : ", cnt, '/', len(file_list))
+
 
 import os
 %cd /content/gdrive/"My Drive"/data/helmetclassification/train/helmet/
@@ -138,6 +168,15 @@ for img_name in remove_candidate_helmet_training_file_list :
 
 %cd /content/gdrive/"My Drive"/data/helmetclassification/test/helmet/
 for img_name in remove_candidate_helmet_testing_file_list :
+  os.remove(img_name)
+
+
+%cd /content/gdrive/"My Drive"/data/helmetclassification/train/non_helmet/
+for img_name in remove_candidate_nonhelmet_training_file_list :
+  os.remove(img_name)
+
+%cd /content/gdrive/"My Drive"/data/helmetclassification/test/non_helmet/
+for img_name in remove_candidate_nonhelmet_testing_file_list :
   os.remove(img_name)
 ```
 
